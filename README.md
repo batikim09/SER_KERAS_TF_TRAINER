@@ -23,7 +23,7 @@ This software relies on several system packages that must be installed using a s
 
 For Ubuntu, please run the following steps:
 
-`sudo apt-get install python-pip python-dev libhdf5-dev portaudio19-dev'
+`sudo apt-get install python-pip python-dev libhdf5-dev'
 
 ### python packages
 Using pip, install all pre-required modules.
