@@ -1,0 +1,8 @@
+#pretrain a model
+python ./src/trainer.py -dnn_depth 2 --conv --u_lstm -r_valid 0.1 -b 128 -e 5 -p 2 -cs 64 -nn 128 -n_time 2,2 -n_row 2,2 -n_col 2,2 -n_filter 2,4 -pool_t 2,4 -pool_r 2,4 -pool_c 2,4 -l2 0.001 -t_max 10 -dt ../SER_FEAT_EXT/h5db/ENT.MSPEC.2d.3cls.av.h5 -mt arousal:3:4::,valence:3:5:: -ot ./output/sanity.txt -sm ./model/pretrained -log ./output/sanity --unweighted -test_idx 0,1,2,3,4,5,6,7,8,9 -valid_idx 10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29
+
+#load the pretrained model and partially update layers
+python ./src/trainer.py -frozen 0:7 -dnn_depth 2 --conv --u_lstm -r_valid 0.1 -b 128 -e 5 -p 2 -cs 64 -nn 128 -n_time 2,2 -n_row 2,2 -n_col 2,2 -n_filter 2,4 -pool_t 2,4 -pool_r 2,4 -pool_c 2,4 -l2 0.001 -t_max 10 -dt ../SER_FEAT_EXT/h5db/ENT.MSPEC.2d.3cls.av.h5 -mt arousal:3:4::,valence:3:5:: -ot ./output/sanity.txt -lm ./model/pretrained.h5 -log ./output/sanity --unweighted -test_idx 0,1,2,3,4,5,6,7,8,9 -valid_idx 10,11,12,13,14,15,16,17,18,19 -train_idx 20,21,22,23,24,25,26,27,28,29
+
+#load the pretrained model and partially update layers and add a new layer
+python ./src/trainer.py -frozen 0:7 -dnn_depth 2 --conv --u_lstm --u_dnn -r_valid 0.1 -b 128 -e 5 -p 2 -cs 64 -nn 64 -n_time 2,2 -n_row 2,2 -n_col 2,2 -n_filter 2,4 -pool_t 2,4 -pool_r 2,4 -pool_c 2,4 -l2 0.001 -t_max 10 -dt ../SER_FEAT_EXT/h5db/ENT.MSPEC.2d.3cls.av.h5 -mt arousal:3:4::,valence:3:5:: -ot ./output/sanity.txt -lm ./model/pretrained.h5 -log ./output/sanity --unweighted -test_idx 0,1,2,3,4,5,6,7,8,9 -valid_idx 10,11,12,13,14,15,16,17,18,19 --train_idx 20,21,22,23,24,25,26,27,28,29
