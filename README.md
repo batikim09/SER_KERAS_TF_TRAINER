@@ -42,7 +42,7 @@ With this small corpus, deep temporal architectures can't provide any benefits. 
 ### Basic training
 Users can combine various types of neural networks such as fully-connected neural network (FCN), convolutional neural network (CNN), long-short-term-memory (LSTM), residual network (RESNET), and highway. 
 
-Feature vectors have temporal structures. For example, the 2D feature input has a shape of (#sample, #time, 1, #context_window, #feature_dim). The 3D feature input has a shape of (#sample, 1, #time, #context_window, #feature_dim). See details of context windows in https://github.com/batikim09/. See "./scripts/basic.sh".
+Feature vectors have temporal structures. For example, the 2D feature input has a shape of (#sample, #time, 1, #context_window, #feature_dim). The 3D feature input has a shape of (#sample, 1, #time, #context_window, #feature_dim). See details of context windows in https://github.com/batikim09/LIVE_SER. See "./scripts/basic.sh".
 
 ### Updating pretrained models
 
