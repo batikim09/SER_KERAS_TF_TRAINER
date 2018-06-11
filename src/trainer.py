@@ -314,7 +314,7 @@ if __name__== "__main__":
     parser.add_argument("-kf_idx", "--kf_idx", dest= 'kf_idx', type=str, help="(0,1,2,3,4)")
     parser.add_argument("-r_valid", "--r_valid", dest= 'r_valid', type=float, help="validation data rate from training", default=0.0)
     parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="multi-tasks (name:classes:idx:(cost_function):(weight)", default = 'acted:2:0::,arousal:2:1::')
-    parser.add_argument("-ot", "--output_file", dest= 'output_file', type=str, help="output.txt")
+    parser.add_argument("-ot", "--output_file", dest= 'output_file', type=str, help="output.txt", default="./output.txt")
     parser.add_argument("-sm", "--save_model", dest= 'save_model', type=str, help="save model", default='./model/model')
     parser.add_argument("-lm", "--load_model", dest= 'load_model', type=str, help="load pre-trained model. Only works with idx. Use train_idx for further training (not adaptation)")
 
