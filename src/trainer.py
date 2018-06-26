@@ -30,6 +30,52 @@ from conv3d_highway import Conv3DHighway
 from keras.models import load_model
 from custom_cost import *
 from sampling import *
+from custom_metric import *
+
+def parse_multi_task(tasks):
+    nameAndClasses = tasks.split(',')
+    multiTasks = []
+    dictForCost = {}
+    dictForWeight = {}
+    dictForEval = {}
+
+    for task in nameAndClasses:
+        params = task.split(':')
+
+        if args.load_model:
+            name = params[0] + "_un"
+        else:
+            name = params[0]
+
+        name = params[0]
+
+        nb_classes = int(params[1])
+        idx = int(params[2])
+
+        multiTasks.append((name, nb_classes, idx))
+        if int(params[1]) == 1:    #regression problem
+            dictForEval[name] = 'mean_squared_error'
+        
+        #default setups
+        dictForCost[name] = 'categorical_crossentropy'  
+        dictForWeight[name] = 1.
+        dictForEval[name] = 'accuracy'
+        
+        if len(params) >= 4 and params[3] != '':
+            dictForCost[name] = params[3]
+                
+        if len(params) >= 5 and params[4] != '':
+            dictForWeight[name] = float(params[4])
+                
+        if len(params) >= 6 and params[5] != '':
+            dictForEval[name] = params[5]
+            
+        print("multiTasks: ", multiTasks)
+        print("dictForCost: ", dictForCost)
+        print("dictForWeight: ", dictForWeight)
+        print("dictForEval: ", dictForEval)
+
+    return multiTasks, dictForCost, dictForWeight, dictForEval
 
 def compile_model_with_custom_cost(model, multiTasks, dictForCost, dictForEval, Y_train, optimizer):
     for task, nb_classes, idx in multiTasks:
@@ -40,6 +86,14 @@ def compile_model_with_custom_cost(model, multiTasks, dictForCost, dictForEval, 
             #dictForCost[task] = CategoricalFocalLoss(nb_classes)
             init_categorical_focal_loss(nb_classes)
             dictForCost[task] = categorical_focal_loss
+        
+        if dictForEval[task] == 'f1':
+            dictForEval[task] = f1
+        elif dictForEval[task] == 'precision':
+            dictForEval[task] = precision
+        elif dictForEval[task] == 'recall':
+            dictForEval[task] = recall
+        
     model.compile(loss=dictForCost, optimizer=optimizer, metrics=dictForEval)
     return model
 
@@ -313,7 +367,7 @@ if __name__== "__main__":
     parser.add_argument("-adopt_idx", "--adopt_idx", dest= 'adopt_idx', type=str, help="Use train_idx together. Train data is first used then, adopted to this data(0,1,2,3,4)")
     parser.add_argument("-kf_idx", "--kf_idx", dest= 'kf_idx', type=str, help="(0,1,2,3,4)")
     parser.add_argument("-r_valid", "--r_valid", dest= 'r_valid', type=float, help="validation data rate from training", default=0.0)
-    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="multi-tasks (name:classes:idx:(cost_function):(weight)", default = 'acted:2:0::,arousal:2:1::')
+    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="multi-tasks (name:classes:idx(:cost_function)(:weight)(:metric)", default = 'acted:2:0,arousal:2:1')
     parser.add_argument("-ot", "--output_file", dest= 'output_file', type=str, help="output.txt", default="./output.txt")
     parser.add_argument("-sm", "--save_model", dest= 'save_model', type=str, help="save model", default='./model/model')
     parser.add_argument("-lm", "--load_model", dest= 'load_model', type=str, help="load pre-trained model. Only works with idx. Use train_idx for further training (not adaptation)")
@@ -513,38 +567,8 @@ if __name__== "__main__":
 
     max_t_steps = train_csv.shape[1]
 
-    nameAndClasses = tasks.split(',')
-    multiTasks = []
-    dictForCost = {}
-    dictForWeight = {}
-    dictForEval = {}
-
-    for task in nameAndClasses:
-        params = task.split(':')
-
-        if args.load_model:
-            name = params[0] + "_un"
-        else:
-            name = params[0]
-
-        name = params[0]
-
-        nb_classes = int(params[1])
-        idx = int(params[2])
-
-        multiTasks.append((name, nb_classes, idx))
-        if int(params[1]) == 1:    #regression problem
-            dictForEval[name] = 'mean_squared_error'
-        else:
-            dictForEval[name] = 'accuracy'
-        if params[3] != '':
-            dictForCost[name] = params[3]
-        else:
-            dictForCost[name] = 'categorical_crossentropy'  
-        if params[4] != '':
-            dictForWeight[name] = float(params[4])
-        else:
-            dictForWeight[name] = 1.
+    #parsing multi-task setups
+    multiTasks, dictForCost, dictForWeight, dictForEval = parse_multi_task(tasks)
 
     if len(multiTasks) > 1:
         stl = False
