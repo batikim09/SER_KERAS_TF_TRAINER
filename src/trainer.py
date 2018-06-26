@@ -69,7 +69,7 @@ def parse_multi_task(tasks):
                 
         if len(params) >= 6 and params[5] != '':
             dictForEval[name] = params[5]
-            
+
         print("multiTasks: ", multiTasks)
         print("dictForCost: ", dictForCost)
         print("dictForWeight: ", dictForWeight)
@@ -220,6 +220,7 @@ def predict_evaluate(X, Y, multiTasks, class_weight_dict, reg, unweighted, datas
     elif unweighted:
         test_scores = unweighted_recall_task(predictions, Y, multiTasks, class_weight_dict, dataset)
     else:
+        print(model.metrics_names)
         test_scores = model.evaluate([X], Y, verbose=0)
     return test_scores
 
@@ -295,6 +296,7 @@ def evaluate(model, multiTasks, X_test, Y_test, max_t_steps, utt_level = True, u
         elif unweighted:
             scores = unweighted_recall_task(predictions, dictForLabelsTest, multiTasks, 'test')
         else:
+            print(model.metrics_names)
             scores = model.evaluate([X_test], dictForLabelsTest, verbose=0)
     else:
         scores = frame_level_evaluation(model, X_test, dictForLabelsTemporalTest, multiTasks, stl, 'test')
